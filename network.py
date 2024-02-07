@@ -116,8 +116,8 @@ class Network(object):
         """ Se termina de calcular las demás entradas de las derivadas parciales"""
         for l in range(2, self.num_layers): # se recorre el numero de capas a partir de la segunda
             z = zs[-l] # tomamos el ultimo valor de z
-            nabla_w[-l] = (1/self.num_layers)*np.sum(x[-l]*(sigmoid(z[-l]-y[-l]))) 
-            nabla_b[-l] = (1/self.num_layers)*np.sum(sigmoid(z[-l]-y[-l]))
+            nabla_w[-l] = (1/self.num_layers)*np.sum(x[-l]*(sigmoid(z[-l]-y[-l])))  #Se guarda el valor de la derivada de la funcion cross entropy con respecto de w
+            nabla_b[-l] = (1/self.num_layers)*np.sum(sigmoid(z[-l]-y[-l])) # Se guarda el valor de la derivada de la funcion cross entropy con respecto de b
         return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
