@@ -103,23 +103,21 @@ class Network(object):
             zs.append(z) # se añade el valor de z al vector de z's
             activation = sigmoid(z) # se calcula la activacion
             activations.append(activation) # se añade la activacion al vector de activaciones
-        # backward pass
-        delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1]) # se calcula delta, multiplicando la derivada de la funcion de costo con la derivada de la funcion sigmoide
-        nabla_b[-1] = delta # se guarda el valor de delta en biases
-        nabla_w[-1] = np.dot(delta, activations[-2].transpose()) # se calcula el peso multiplicando dela con el vector de activaciones
+        
+        """ Actualizamos nabla w y nabla b para que vaya de acuerdo a la funcion cross entropy"""
+        nabla_w[-1] = np.sum(x[-1]*(sigmoid(z[-1]-y[-1]))) #Se guarda el valor de la derivada de la funcion cross entropy con respecto de w
+        nabla_b[-1] = np.sum(sigmoid(z[-1]-y[-1])) # Se guarda el valor de la derivada de la funcion cross entropy con respecto de b
         # Note that the variable l in the loop below is used a little
         # differently to the notation in Chapter 2 of the book.  Here,
         # l = 1 means the last layer of neurons, l = 2 is the
         # second-last layer, and so on.  It's a renumbering of the
         # scheme in the book, used here to take advantage of the fact
         # that Python can use negative indices in lists.
+        """ Se termina de calcular las demás entradas de las derivadas parciales"""
         for l in range(2, self.num_layers): # se recorre el numero de capas a partir de la segunda
             z = zs[-l] # tomamos el ultimo valor de z
-            sp = sigmoid_prime(z) # se calcula la derivada de la funcion sigmmoide en z
-            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp # se calcula el valor de delta con los pesos y el delta anterior
-            nabla_b[-l] = delta # se guarda el valor de delta en biases
-            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose()) # se calcula el ultimo peso con delta y las activaciones
+            nabla_w[-l] = (1/self.num_layers)*np.sum(x[-l]*(sigmoid(z[-l]-y[-l]))) 
+            nabla_b[-l] = (1/self.num_layers)*np.sum(sigmoid(z[-l]-y[-l]))
         return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
@@ -134,8 +132,10 @@ class Network(object):
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
         \partial a for the output activations."""
-        return (output_activations-y) # al vector de activaciones se le resta el vector de salidas y eso es la derivada parcial de la funcion de costo
-                                      # con respecto de a 
+
+        """ Se cambia la derivada de la funcion de costo anterior a la derivada de la funcion cross-entropy"""
+        return ((output_activations-y)/(output_activations*(1-output_activations)))
+            
 
 #### Miscellaneous functions
 def sigmoid(z):
